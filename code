@@ -1,0 +1,80 @@
+#IMPORTS===============================================================================================================
+import csv                                                                  
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import HuberRegressor
+from sklearn.model_selection import train_test_split
+import math
+
+#FUNCTIONS=============================================================================================================
+def read_csv_and_select_columns(file_path, X_columns_indices, y_column_index):
+    X_values = [[] for _ in range(len(X_columns_indices))]  # List to store values from each X column
+    y_values = []  # List to store values from the y column
+    
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            try:
+                for i, x_index in enumerate(X_columns_indices):
+                    x_value = row[x_index]
+                    X_values[i].append(x_value)
+                y_value = row[y_column_index]
+                y_values.append(y_value)
+            except IndexError:
+                print("Invalid column index. Check the number of columns in the CSV file.")
+                return
+
+#MAIN FUNCTION==========================================================================================================
+    return X_values, y_values
+def main():
+    #csv_file_path = ask_for_csv_file()
+    csv_file_path = filepath
+    
+    X_values, y_values = read_csv_and_select_columns(csv_file_path, X_columns, y_column)
+    
+    # Remove column names
+    for x_column_values in X_values:
+        x_column_values.pop(0)
+    y_values.pop(0)
+    
+    # Convert to arrays
+    X_arrays = [np.array([float(x) for x in x_column]) for x_column in X_values]
+    y_floats = np.array([float(x) for x in y_values])
+    
+    # Convert X arrays into a pandas DataFrame
+    X_df = pd.DataFrame(np.column_stack(X_arrays), columns=[f'X_{i}' for i in range(len(X_arrays))])
+
+    # Split data using pandas DataFrame
+    X_train, X_rest, y_train, y_rest = train_test_split(X_df, y_floats, train_size=train_num, random_state=42)
+    X_calib, X_test, y_calib, y_test = train_test_split(X_rest, y_rest, train_size=calib_num, random_state=42)
+
+    # Model selection
+    model.fit(X_train, y_train)
+
+    # Make predictions from model
+    predictions = model.predict(X_calib).transpose()
+
+    # Find residuals
+    residuals = np.abs(predictions - y_calib)
+    # Sort df of residuals by descending order
+    residuals_df = pd.DataFrame(residuals, columns=["Residuals"])
+    sort_residuals = residuals_df.sort_values(by=['Residuals'], ascending=False)
+
+    #Find the cutoff point using specified alpha
+    qhat = np.quantile(sort_residuals, (1 - alpha))
+    print(qhat)
+
+
+#__NAME__ == "__MAIN__======================================================================================================
+if __name__ == "__main__":
+
+    # Inputs
+    filepath = "/Users/alejandro/Desktop/data.csv"
+    X_columns = [9,10,11] # Indices of x-axis values columns
+    y_column = 11  # Index of y-axis values column
+    train_num = 63
+    calib_num = 63
+    model = HuberRegressor()
+    alpha = 0.2
+
+    main()
