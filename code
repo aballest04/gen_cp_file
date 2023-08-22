@@ -72,9 +72,9 @@ if __name__ == "__main__":
     filepath = "/Users/alejandro/Desktop/data.csv"
     X_columns = [9,10,11] # Indices of x-axis values columns
     y_column = 11  # Index of y-axis values column
-    train_num = 63
-    calib_num = 63
-    model = HuberRegressor()
-    alpha = 0.2
+    train_num = 63 # Number of training points
+    calib_num = 63 # Number of calibration points
+    model = HuberRegressor() # type of model used
+    alpha = 0.2 # alpha level
 
     main()
